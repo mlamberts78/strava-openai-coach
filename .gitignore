@@ -12,3 +12,6 @@ data/*
 # personal prompts
 daily_prompt.txt
 weekly_prompt.txt
+
+# other
+*.sh
