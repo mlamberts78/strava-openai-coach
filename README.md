@@ -1,3 +1,5 @@
+[![Buy me a coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/mlamberts7I)
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-blue?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=HZUUW64FRM2J2)
 # Strava AI Coach
 
 AI-powered Strava training analyzer that fetches your latest activities (including laps and descriptions) via the Strava API and generates personalized insights, race predictions, and training suggestions using OpenAI.  
