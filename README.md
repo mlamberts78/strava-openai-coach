@@ -93,6 +93,8 @@ cp -rp daily_prompt.txt.sample daily_prompt.txt
 cp -rp weekly_prompt.txt.sample weekly_prompt.txt
 ```
 
+**TIP:** Create the prompt in your own language, and the report will be generated in that same language.
+
 ## 🏃 Usage
 
 ### Daily analysis
