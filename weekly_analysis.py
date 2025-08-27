@@ -1,7 +1,9 @@
-# weekly_check.py
-import itertools
+# weekly_analysis.py
 from strava_coach_common import (
     list_my_activities,
+    get_activity,
+    get_activity_laps,
+    get_activity_streams,
     coach_prompt_for_week,
     call_openai_chat,
     save_output
@@ -27,11 +29,24 @@ def main():
         print("No recent runs found.")
         return
 
+    enriched_runs = []
+    for run in last7:
+        details = get_activity(run["id"])
+        try:
+            laps = get_activity_laps(run["id"])
+        except Exception:
+            laps = []
+        try:
+            streams = get_activity_streams(run["id"], ["time", "heartrate", "velocity_smooth", "cadence"])
+        except Exception:
+            streams = {}
+        enriched_runs.append({"details": details, "laps": laps, "streams": streams})
+
     # Generate prompt dynamically from WEEKLY_PROMPT_FILE
-    messages = coach_prompt_for_week(last7)
+    messages = coach_prompt_for_week(enriched_runs)
     analysis = call_openai_chat(messages)
 
-    raw = {"input_runs": last7, "analysis": analysis}
+    raw = {"input_runs": enriched_runs, "analysis": analysis}
     save_output("weekly", "last7_runs", analysis, raw)
 
     print("Weekly analysis saved.")

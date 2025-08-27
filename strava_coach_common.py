@@ -192,21 +192,49 @@ def coach_prompt_for_week(activities: List[Dict[str, Any]]) -> List[Dict[str, st
     prompt_text = load_prompt(WEEKLY_PROMPT_FILE)
     slim = []
     for a in activities:
+        details = a["details"]
+        laps = a.get("laps", [])
+        streams = a.get("streams", {})
+
+        laps_slim = []
+        for l in laps:
+            laps_slim.append({
+                "lap": l.get("lap_index"),
+                "split": l.get("split"),
+                "distance_m": l.get("distance"),
+                "elapsed_time_s": l.get("elapsed_time"),
+                "moving_time_s": l.get("moving_time"),
+                "avg_speed_mps": l.get("average_speed"),
+                "avg_hr": l.get("average_heartrate"),
+                "max_hr": l.get("max_heartrate"),
+                "cadence": l.get("average_cadence"),
+            })
+
+        s_compact = {}
+        if streams:
+            for k in ("time", "heartrate", "velocity_smooth", "cadence"):
+                if k in streams and "data" in streams[k]:
+                    s_compact[k] = streams[k]["data"][:300]  # minder data per run
+
         slim.append({
-            "id": a.get("id"),
-            "name": a.get("name"),
-            "start_date_local": a.get("start_date_local"),
-            "distance_m": a.get("distance"),
-            "moving_time_s": a.get("moving_time"),
-            "avg_speed_mps": a.get("average_speed"),
-            "avg_hr": a.get("average_heartrate"),
-            "elev_gain_m": a.get("total_elevation_gain"),
-            "type": a.get("type"),
+            "id": details.get("id"),
+            "name": details.get("name"),
+            "description": details.get("description"),
+            "start_date_local": details.get("start_date_local"),
+            "distance_m": details.get("distance"),
+            "moving_time_s": details.get("moving_time"),
+            "avg_speed_mps": details.get("average_speed"),
+            "avg_hr": details.get("average_heartrate"),
+            "elev_gain_m": details.get("total_elevation_gain"),
+            "type": details.get("type"),
+            "laps": laps_slim,
+            "streams": s_compact,
         })
+
     system = prompt_text
     user = (
-        "Here are the last 7 running sessions (JSON). Create a summary with key metrics, evaluation, "
-        "and suggested plan for next week.\n\n"
+        "Here are the last 7 running sessions (with description, laps, and shortened streams in JSON). "
+        "Create a weekly summary with key metrics, evaluation, and suggested plan for next week.\n\n"
         f"{json.dumps(slim, ensure_ascii=False)}"
     )
     return [
