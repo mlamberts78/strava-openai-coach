@@ -15,7 +15,7 @@ The project supports:
 
 - Fetch activities automatically from Strava API  
 - Include activity metadata, description, and laps in the analysis  
-- Generate insights with OpenAI GPT-5, as if written by a professional running coach  
+- Generate insights with OpenAI, as if written by a professional running coach  
 - Store results in `daily/` and `weekly/` folders  
 - Customizable prompts via `prompts/` directory  
 - Secure environment variables via `.env`  
@@ -46,10 +46,50 @@ STRAVA_REFRESH_TOKEN=your_refresh_token
 
 🔑 To get a refresh token, create a Strava app in https://www.strava.com/settings/api
 
+In case of issues, you can get a new valid refresh token
+
+You need a refresh token so the script can obtain a (short-lived) access token.
+
+### Option A — Browser + curl (manual)
+
+Open this URL in your browser (replace CLIENT_ID and REDIRECT_URI accordingly — redirect_uri can be any valid redirect you set in your Strava app):
+
+https://www.strava.com/oauth/authorize?client_id=CLIENT_ID&response_type=code&redirect_uri=http://localhost/exchange_token&approval_prompt=force&scope=activity:read,activity:read_all
+
+After authorizing you get a code in the redirect URL: ?code=XXXX.
+
+Exchange the code for tokens:
+
+curl -X POST https://www.strava.com/oauth/token \
+  -F client_id=CLIENT_ID \
+  -F client_secret=CLIENT_SECRET \
+  -F code=XXXX \
+  -F grant_type=authorization_code
+
+Save refresh_token from the response into .env as STRAVA_REFRESH_TOKEN (or place it into data/strava_tokens.json as described below).
+
+### Option B — helper script (get_strava_tokens.py) 
+
+Use the get_strava_tokens.py helper, run it while your venv is active; it will open the URL for you and store data/strava_tokens.json automatically.
+
 ### OpenAI API
 OPENAI_API_KEY=your_openai_key
 
 🔑 create your OpenAI API key here: https://platform.openai.com/api-keys
+
+### Customizing Prompts
+
+daily_prompt.txt → used for daily activity analysis
+
+weekly_prompt.txt → used for weekly summary analysis
+
+Edit these files to adjust how openai analyzes your runs (e.g., focus on pacing, intervals, recovery, or race prediction).
+
+Samples can be used:
+```bash
+cp -rp daily_prompt.txt.sample daily_prompt.txt
+cp -rp weekly_prompt.txt.sample weekly_prompt.txt
+```
 
 ## 🏃 Usage
 

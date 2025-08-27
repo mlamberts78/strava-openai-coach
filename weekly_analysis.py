@@ -1,7 +1,10 @@
-# weekly_analysis.py
+# weekly_check.py
 import itertools
 from strava_coach_common import (
-    list_my_activities, coach_prompt_for_week, call_openai_chat, save_output
+    list_my_activities,
+    coach_prompt_for_week,
+    call_openai_chat,
+    save_output
 )
 
 def main():
@@ -12,22 +15,25 @@ def main():
         if not page_data:
             break
         all_recent.extend(page_data)
-        if len(all_recent) >= 100:
+        if len(all_recent) >= 200:  # safety limit
             break
 
     # Filter for Runs and take the last 7
     runs = [a for a in all_recent if a.get("type") == "Run"]
     runs_sorted = sorted(runs, key=lambda a: a.get("start_date_local", ""), reverse=True)
     last7 = runs_sorted[:7]
+
     if not last7:
         print("No recent runs found.")
         return
 
+    # Generate prompt dynamically from WEEKLY_PROMPT_FILE
     messages = coach_prompt_for_week(last7)
     analysis = call_openai_chat(messages)
 
     raw = {"input_runs": last7, "analysis": analysis}
     save_output("weekly", "last7_runs", analysis, raw)
+
     print("Weekly analysis saved.")
 
 if __name__ == "__main__":

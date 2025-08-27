@@ -1,15 +1,22 @@
 # daily_check.py
 import sys
 from strava_coach_common import (
-    list_my_activities, get_activity, get_activity_streams, get_activity_laps,
-    load_state, save_state, coach_prompt_for_single, call_openai_chat, save_output
+    list_my_activities,
+    get_activity,
+    get_activity_streams,
+    get_activity_laps,
+    load_state,
+    save_state,
+    coach_prompt_for_single,
+    call_openai_chat,
+    save_output
 )
 
 def main():
     state = load_state()
     last_seen = state.get("last_seen_activity_id")
 
-    # Fetch the most recent activity (page 1, per_page 1)
+    # Fetch the most recent activity
     latest_list = list_my_activities(per_page=1, page=1)
     if not latest_list:
         print("No activities found.")
@@ -22,6 +29,7 @@ def main():
         print(f"No new activity. Last seen: {last_seen}")
         return
 
+    # Fetch activity details
     details = get_activity(latest_id)
     streams, laps = {}, []
 
@@ -35,13 +43,16 @@ def main():
         except Exception as e:
             print(f"Laps not available: {e}")
 
+    # Generate prompt dynamically from DAILY_PROMPT_FILE
     messages = coach_prompt_for_single(details, streams, laps)
     analysis = call_openai_chat(messages)
 
+    # Save results
     slug = f"activity_{latest_id}"
     raw = {"activity": details, "streams": streams, "laps": laps, "analysis": analysis}
     save_output("daily", slug, analysis, raw)
 
+    # Update state
     state["last_seen_activity_id"] = latest_id
     save_state(state)
 

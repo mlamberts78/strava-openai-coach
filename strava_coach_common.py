@@ -24,12 +24,16 @@ STRAVA_REFRESH_TOKEN = os.environ["STRAVA_REFRESH_TOKEN"]
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5")  # choose your model slot
 
+DAILY_PROMPT_FILE = os.getenv("DAILY_PROMPT_FILE", "daily_prompt.txt")
+WEEKLY_PROMPT_FILE = os.getenv("WEEKLY_PROMPT_FILE", "weekly_prompt.txt")
+
 # --- OpenAI client (Chat Completions) ---
 oai = OpenAI(api_key=OPENAI_API_KEY)
 
 STRAVA_API = "https://www.strava.com/api/v3"
 
 
+# --- Utility functions ---
 def now_iso():
     return dt.datetime.now(dt.timezone.utc).isoformat()
 
@@ -48,9 +52,6 @@ def _load_json(path: pathlib.Path, default: Any):
 
 
 def _refresh_access_token() -> Dict[str, Any]:
-    """
-    Refresh via Strava OAuth refresh flow.
-    """
     payload = {
         "client_id": STRAVA_CLIENT_ID,
         "client_secret": STRAVA_CLIENT_SECRET,
@@ -60,7 +61,6 @@ def _refresh_access_token() -> Dict[str, Any]:
     r = requests.post("https://www.strava.com/oauth/token", data=payload, timeout=30)
     r.raise_for_status()
     tokens = r.json()
-    # Save the most recent refresh_token (old one becomes invalid)
     _save_json(TOKENS_PATH, {
         "access_token": tokens["access_token"],
         "refresh_token": tokens["refresh_token"],
@@ -78,14 +78,10 @@ def _get_access_token() -> str:
 
 
 def strava_get(path: str, params: Optional[Dict[str, Any]] = None) -> Any:
-    """
-    Generic GET helper with bearer token.
-    """
     access_token = _get_access_token()
     headers = {"Authorization": f"Bearer {access_token}"}
     r = requests.get(f"{STRAVA_API}{path}", headers=headers, params=params or {}, timeout=60)
     if r.status_code == 401:
-        # Token expired → force refresh
         _refresh_access_token()
         access_token = _get_access_token()
         headers = {"Authorization": f"Bearer {access_token}"}
@@ -95,25 +91,18 @@ def strava_get(path: str, params: Optional[Dict[str, Any]] = None) -> Any:
 
 
 def list_my_activities(per_page: int = 30, page: int = 1) -> List[Dict[str, Any]]:
-    # /athlete/activities – requires activity:read / activity:read_all for private
     return strava_get("/athlete/activities", {"per_page": per_page, "page": page})
 
 
 def get_activity(activity_id: int) -> Dict[str, Any]:
-    # Full activity
     return strava_get(f"/activities/{activity_id}")
 
 
 def get_activity_laps(activity_id: int):
-    """
-    Retrieve laps of an activity.
-    Endpoint: GET /activities/{id}/laps
-    """
     return strava_get(f"/activities/{activity_id}/laps")
 
 
 def get_activity_streams(activity_id: int, keys: List[str]) -> Dict[str, Any]:
-    # /activities/{id}/streams?keys=...
     params = {"keys": ",".join(keys), "key_by_type": "true"}
     return strava_get(f"/activities/{activity_id}/streams", params)
 
@@ -137,7 +126,17 @@ def save_output(kind: str, filename_slug: str, content_md: str, raw: Dict[str, A
         f.write(content_md)
 
 
+# --- Prompt loader ---
+def load_prompt(file_path: str) -> str:
+    path = pathlib.Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {file_path}")
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
 def coach_prompt_for_single(activity: Dict[str, Any], streams=None, laps=None):
+    prompt_text = load_prompt(DAILY_PROMPT_FILE)
     core = {
         "id": activity.get("id"),
         "name": activity.get("name"),
@@ -160,7 +159,7 @@ def coach_prompt_for_single(activity: Dict[str, Any], streams=None, laps=None):
     if streams:
         for k in ("time", "heartrate", "velocity_smooth", "cadence"):
             if k in streams and "data" in streams[k]:
-                s_compact[k] = streams[k]["data"][:600]  # shorten
+                s_compact[k] = streams[k]["data"][:600]
 
     laps_slim = []
     if laps:
@@ -177,16 +176,8 @@ def coach_prompt_for_single(activity: Dict[str, Any], streams=None, laps=None):
                 "cadence": l.get("average_cadence"),
             })
 
-    system = (
-        "You are an experienced running coach. "
-        "Analyze the workout based on activity data, streams, and laps."
-    )
+    system = prompt_text
     user = (
-        "Analyze this running session and provide:\n"
-        "1) Summary of the workout (distance, pace, HR)\n"
-        "2) Evaluation of intervals or blocks (use the laps data!)\n"
-        "3) Strengths & areas for improvement\n"
-        "4) Concrete training advice for next time\n\n"
         f"Core data including description:\n{json.dumps(core, ensure_ascii=False)}\n\n"
         f"Laps:\n{json.dumps(laps_slim, ensure_ascii=False)}\n\n"
         f"Streams (shortened):\n{json.dumps(s_compact, ensure_ascii=False)}"
@@ -198,9 +189,7 @@ def coach_prompt_for_single(activity: Dict[str, Any], streams=None, laps=None):
 
 
 def coach_prompt_for_week(activities: List[Dict[str, Any]]) -> List[Dict[str, str]]:
-    """
-    Prompt to summarize the last 7 runs and provide coaching advice.
-    """
+    prompt_text = load_prompt(WEEKLY_PROMPT_FILE)
     slim = []
     for a in activities:
         slim.append({
@@ -214,15 +203,10 @@ def coach_prompt_for_week(activities: List[Dict[str, Any]]) -> List[Dict[str, st
             "elev_gain_m": a.get("total_elevation_gain"),
             "type": a.get("type"),
         })
-    system = (
-        "You are a performance-oriented running coach. Evaluate progress, training load, and variety."
-    )
+    system = prompt_text
     user = (
-        "Here are the last 7 running sessions (JSON). Create:\n"
-        "- Weekly overview with key metrics (volume in km, avg pace, avg HR)\n"
-        "- What went well, what can improve\n"
-        "- Suggested plan for next week (4 sessions) with pace/HR guidelines\n"
-        "- Preparation towards 10M and half marathon\n\n"
+        "Here are the last 7 running sessions (JSON). Create a summary with key metrics, evaluation, "
+        "and suggested plan for next week.\n\n"
         f"{json.dumps(slim, ensure_ascii=False)}"
     )
     return [
@@ -232,9 +216,6 @@ def coach_prompt_for_week(activities: List[Dict[str, Any]]) -> List[Dict[str, st
 
 
 def call_openai_chat(messages: List[Dict[str, str]]) -> str:
-    """
-    Chat Completions (Python SDK).
-    """
     resp = oai.chat.completions.create(
         model=OPENAI_MODEL,
         messages=messages,
