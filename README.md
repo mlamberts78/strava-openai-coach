@@ -52,7 +52,11 @@ STRAVA_REFRESH_TOKEN=your_refresh_token
 
 You need a refresh token so the script can obtain a (short-lived) access token.
 
-#### Option A — Browser + curl (manual)
+#### Option A — helper script (get_strava_tokens.py) 
+
+Use the **get_strava_tokens.py** helper, run it while your venv is active; it will open the URL for you and store data/strava_tokens.json automatically.
+
+#### Option B — Browser + curl (manual)
 
 Open this URL in your browser (replace CLIENT_ID and REDIRECT_URI accordingly — redirect_uri can be any valid redirect you set in your Strava app):
 
@@ -69,10 +73,6 @@ curl -X POST https://www.strava.com/oauth/token \
   -F grant_type=authorization_code
 
 Save refresh_token from the response into .env as STRAVA_REFRESH_TOKEN (or place it into data/strava_tokens.json as described below).
-
-#### Option B — helper script (get_strava_tokens.py) 
-
-Use the get_strava_tokens.py helper, run it while your venv is active; it will open the URL for you and store data/strava_tokens.json automatically.
 
 ### OpenAI API
 OPENAI_API_KEY=your_openai_key
@@ -123,7 +123,7 @@ To run automatically on a Rocky Linux server, set up cron jobs:
 ### Weekly analysis every Monday at 07:00
 0 7 * * MON /path/to/venv/bin/python /path/to/weekly_analysis.py >> /var/log/strava_weekly.log 2>&1
 
-#### 📊 Example output
+## 📊 Example output
 
 Daily analysis file (20250827-105308_activity_15601264415.md):
 
