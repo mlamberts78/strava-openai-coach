@@ -1,13 +1,8 @@
 # pyenv
 .python-version
-
 .env
-.venv
-.idea
-.vscode
-
-.pytest_cache/
-.mypy_cache/
+.venv/
+__pycache__/
 
 # user data
 daily/*
