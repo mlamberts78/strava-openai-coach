@@ -48,11 +48,11 @@ STRAVA_REFRESH_TOKEN=your_refresh_token
 
 🔑 To get a refresh token, create a Strava app in https://www.strava.com/settings/api
 
-In case of issues, you can get a new valid refresh token
+### In case of issues, you can get a new valid refresh token:
 
 You need a refresh token so the script can obtain a (short-lived) access token.
 
-### Option A — Browser + curl (manual)
+#### Option A — Browser + curl (manual)
 
 Open this URL in your browser (replace CLIENT_ID and REDIRECT_URI accordingly — redirect_uri can be any valid redirect you set in your Strava app):
 
@@ -70,7 +70,7 @@ curl -X POST https://www.strava.com/oauth/token \
 
 Save refresh_token from the response into .env as STRAVA_REFRESH_TOKEN (or place it into data/strava_tokens.json as described below).
 
-### Option B — helper script (get_strava_tokens.py) 
+#### Option B — helper script (get_strava_tokens.py) 
 
 Use the get_strava_tokens.py helper, run it while your venv is active; it will open the URL for you and store data/strava_tokens.json automatically.
 
