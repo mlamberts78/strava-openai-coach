@@ -49,6 +49,8 @@ STRAVA_REFRESH_TOKEN=your_refresh_token
 ### OpenAI API
 OPENAI_API_KEY=your_openai_key
 
+🔑 create your OpenAI API key here: https://platform.openai.com/api-keys
+
 ## 🏃 Usage
 
 ### Daily analysis
