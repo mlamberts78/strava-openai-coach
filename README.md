@@ -47,43 +47,19 @@ cp -rp .env.sample .env
 Edit .env
 ### Strava API
 STRAVA_CLIENT_ID=your_client_id
+
 STRAVA_CLIENT_SECRET=your_client_secret
+
 STRAVA_REFRESH_TOKEN=your_refresh_token
 
 🔑 To get a refresh token, create a Strava app in https://www.strava.com/settings/api
-
-### In case of issues, you can get a new valid refresh token:
-
-You need a refresh token so the script can obtain a (short-lived) access token.
-
-#### Option A — helper script (get_strava_tokens.py) 
-
-Use the **get_strava_tokens.py** helper, run it while your venv is active; it will open the URL for you and store data/strava_tokens.json automatically.
-
-#### Option B — Browser + curl (manual)
-
-Open this URL in your browser (replace CLIENT_ID and REDIRECT_URI accordingly — redirect_uri can be any valid redirect you set in your Strava app):
-
-https://www.strava.com/oauth/authorize?client_id=CLIENT_ID&response_type=code&redirect_uri=http://localhost/exchange_token&approval_prompt=force&scope=activity:read,activity:read_all
-
-After authorizing you get a code in the redirect URL: ?code=XXXX.
-
-Exchange the code for tokens:
-
-curl -X POST https://www.strava.com/oauth/token \
-  -F client_id=CLIENT_ID \
-  -F client_secret=CLIENT_SECRET \
-  -F code=XXXX \
-  -F grant_type=authorization_code
-
-Save refresh_token from the response into .env as STRAVA_REFRESH_TOKEN (or place it into data/strava_tokens.json as described below).
 
 ### OpenAI API
 OPENAI_API_KEY=your_openai_key
 
 🔑 create your OpenAI API key here: https://platform.openai.com/api-keys
 
-### Customizing Prompts
+### 4. Customizing Prompts
 
 daily_prompt.txt → used for daily activity analysis
 
@@ -193,3 +169,31 @@ Strengths
 - Week structure: Follow this with an easy day or two. Complement with 1 short hill/strength session (e.g., 8–10 x 10–15 s hills) later in the week and light mobility for calves/hips post-run.
 
 ## Excellent, disciplined session — you matched the plan precisely and finished strong.
+
+==================
+
+## In case of issues with the STRAVA refresh token:
+
+You need a refresh token so the script can obtain a (short-lived) access token.
+
+#### Option A — helper script (get_strava_tokens.py) 
+
+Use the **get_strava_tokens.py** helper, run it while your venv is active; it will open the URL for you and store data/strava_tokens.json automatically.
+
+#### Option B — Browser + curl (manual)
+
+Open this URL in your browser (replace CLIENT_ID and REDIRECT_URI accordingly — redirect_uri can be any valid redirect you set in your Strava app):
+
+https://www.strava.com/oauth/authorize?client_id=CLIENT_ID&response_type=code&redirect_uri=http://localhost/exchange_token&approval_prompt=force&scope=activity:read,activity:read_all
+
+After authorizing you get a code in the redirect URL: ?code=XXXX.
+
+Exchange the code for tokens:
+
+curl -X POST https://www.strava.com/oauth/token \
+  -F client_id=CLIENT_ID \
+  -F client_secret=CLIENT_SECRET \
+  -F code=XXXX \
+  -F grant_type=authorization_code
+
+Save refresh_token from the response into .env as STRAVA_REFRESH_TOKEN (or place it into data/strava_tokens.json as described below).
