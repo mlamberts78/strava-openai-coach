@@ -41,6 +41,10 @@ pip install -r requirements.txt
 
 Create a .env file in the root directory with:
 
+```bash
+cp -rp .env.sample .env
+```
+Edit .env
 ### Strava API
 STRAVA_CLIENT_ID=your_client_id
 STRAVA_CLIENT_SECRET=your_client_secret
