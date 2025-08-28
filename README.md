@@ -50,14 +50,19 @@ STRAVA_CLIENT_ID=your_client_id
 
 STRAVA_CLIENT_SECRET=your_client_secret
 
-STRAVA_REFRESH_TOKEN=your_refresh_token
-
-🔑 To get a refresh token, create a Strava app in https://www.strava.com/settings/api
-
 ### OpenAI API
 OPENAI_API_KEY=your_openai_key
 
 🔑 create your OpenAI API key here: https://platform.openai.com/api-keys
+
+### 4. Get Strava refresh token
+
+Use the get_strava_tokens.py helper, run it while your venv is active; it will open the URL for you and store data/strava_tokens.json automatically.
+
+```bash
+. .venv/bin/activate
+python get_strava_tokens.py
+```
 
 ### 4. Customizing Prompts
 
