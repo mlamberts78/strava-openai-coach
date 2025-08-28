@@ -105,7 +105,7 @@ cp -rp weekly_prompt.txt.sample weekly_prompt.txt
 
 Fetch the most recent activity and run the daily prompt:
 ```bash
-source .venv/bin/activate
+. .venv/bin/activate
 python daily_check.py
 ```
 
@@ -115,7 +115,7 @@ Output → daily/YYYYMMDD-HHMMSS_activity_{id}.md
 
 Fetch last 7 runs and generate a summary:
 ```bash
-source .venv/bin/activate
+. .venv/bin/activate
 python weekly_analysis.py
 ```
 
