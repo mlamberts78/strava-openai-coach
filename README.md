@@ -29,7 +29,7 @@ The project supports:
 ### 1. Clone repository
 ```bash
 git clone https://github.com/mlamberts78/strava-openai-coach.git
-cd strava-ai-coach
+cd strava-openai-coach
 ```
 ### 2. Install dependencies
 ```bash
