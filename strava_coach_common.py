@@ -7,7 +7,7 @@ import datetime as dt
 from typing import Dict, Any, List, Optional
 import requests
 from dotenv import load_dotenv
-from openai import OpenAI
+import openai
 
 load_dotenv()
 
@@ -28,7 +28,7 @@ DAILY_PROMPT_FILE = os.getenv("DAILY_PROMPT_FILE", "daily_prompt.txt")
 WEEKLY_PROMPT_FILE = os.getenv("WEEKLY_PROMPT_FILE", "weekly_prompt.txt")
 
 # --- OpenAI client (Chat Completions) ---
-oai = OpenAI(api_key=OPENAI_API_KEY)
+openai.api_key = OPENAI_API_KEY
 
 STRAVA_API = "https://www.strava.com/api/v3"
 
@@ -244,7 +244,7 @@ def coach_prompt_for_week(activities: List[Dict[str, Any]]) -> List[Dict[str, st
 
 
 def call_openai_chat(messages: List[Dict[str, str]]) -> str:
-    resp = oai.chat.completions.create(
+    resp = openai.chat.completions.create(
         model=OPENAI_MODEL,
         messages=messages,
         temperature=1,
