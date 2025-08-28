@@ -55,7 +55,7 @@ def _refresh_access_token() -> Dict[str, Any]:
         "client_id": STRAVA_CLIENT_ID,
         "client_secret": STRAVA_CLIENT_SECRET,
         "grant_type": "refresh_token",
-        "refresh_token": _load_json(TOKENS_PATH, {}).get("refresh_token", STRAVA_REFRESH_TOKEN),
+        "refresh_token": _load_json(TOKENS_PATH, {}).get("refresh_token"),
     }
     r = requests.post("https://www.strava.com/oauth/token", data=payload, timeout=30)
     r.raise_for_status()
