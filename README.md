@@ -33,8 +33,8 @@ cd strava-ai-coach
 ```
 ### 2. Install dependencies
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 ### 3. Configure .env
@@ -101,7 +101,8 @@ cp -rp weekly_prompt.txt.sample weekly_prompt.txt
 
 Fetch the most recent activity and run the daily prompt:
 ```bash
-python daily_analysis.py
+source .venv/bin/activate
+python daily_check.py
 ```
 
 Output → daily/YYYYMMDD-HHMMSS_activity_{id}.md
@@ -110,6 +111,7 @@ Output → daily/YYYYMMDD-HHMMSS_activity_{id}.md
 
 Fetch last 7 runs and generate a summary:
 ```bash
+source .venv/bin/activate
 python weekly_analysis.py
 ```
 
