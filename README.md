@@ -104,7 +104,7 @@ Output → weekly/YYYYMMDD-HHMMSS_last7_runs.md
 
 ## 📅 Automation
 
-To run automatically on a Rocky Linux server, set up cron jobs:
+To run automatically on a Linux server, set up cron jobs:
 
 ### Daily analysis at 06:00
 0 6 * * * /path/to/venv/bin/python /path/to/daily_analysis.py >> /var/log/strava_daily.log 2>&1
