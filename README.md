@@ -29,18 +29,22 @@ The project supports:
 ### 1. Clone repository
 ```bash
 git clone https://github.com/mlamberts78/strava-openai-coach.git
-cd strava-ai-coach
+cd strava-openai-coach
 ```
 ### 2. Install dependencies
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 ### 3. Configure .env
 
 Create a .env file in the root directory with:
 
+```bash
+cp -rp .env.sample .env
+```
+Edit .env
 ### Strava API
 STRAVA_CLIENT_ID=your_client_id
 STRAVA_CLIENT_SECRET=your_client_secret
@@ -93,13 +97,16 @@ cp -rp daily_prompt.txt.sample daily_prompt.txt
 cp -rp weekly_prompt.txt.sample weekly_prompt.txt
 ```
 
+**TIP:** Create the prompt in your own language, and the report will be generated in that same language.
+
 ## 🏃 Usage
 
 ### Daily analysis
 
 Fetch the most recent activity and run the daily prompt:
 ```bash
-python daily_analysis.py
+. .venv/bin/activate
+python daily_check.py
 ```
 
 Output → daily/YYYYMMDD-HHMMSS_activity_{id}.md
@@ -108,6 +115,7 @@ Output → daily/YYYYMMDD-HHMMSS_activity_{id}.md
 
 Fetch last 7 runs and generate a summary:
 ```bash
+. .venv/bin/activate
 python weekly_analysis.py
 ```
 
