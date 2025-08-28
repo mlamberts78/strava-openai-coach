@@ -19,7 +19,6 @@ STATE_PATH = DATA_DIR / "state.json"
 
 STRAVA_CLIENT_ID = os.environ["STRAVA_CLIENT_ID"]
 STRAVA_CLIENT_SECRET = os.environ["STRAVA_CLIENT_SECRET"]
-STRAVA_REFRESH_TOKEN = os.environ["STRAVA_REFRESH_TOKEN"]
 
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5")  # choose your model slot
