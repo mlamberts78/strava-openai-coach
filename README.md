@@ -104,13 +104,21 @@ Output → weekly/YYYYMMDD-HHMMSS_last7_runs.md
 
 ## 📅 Automation
 
+### 1. Cron
+
 To run automatically on a Linux server, set up cron jobs:
 
 ### Daily analysis at 06:00
 0 6 * * * /path/to/venv/bin/python /path/to/daily_analysis.py >> /var/log/strava_daily.log 2>&1
 
 ### Weekly analysis every Monday at 07:00
-0 7 * * MON /path/to/venv/bin/python /path/to/weekly_analysis.py >> /var/log/strava_weekly.log 2>&1
+0 7 * * 1 /path/to/venv/bin/python /path/to/weekly_analysis.py >> /var/log/strava_weekly.log 2>&1
+
+### 2. Sending report by mail
+When configuring mail on your server, you can create a small Bash script that sends the output file to your email.
+This script can then be scheduled using cron.
+
+💡 **TIP:** Add this to your prompt: "Generate the output in HTML format so that it is easily readable when sent via email."
 
 ## 📊 Example output
 
