@@ -21,7 +21,7 @@ def main():
             break
 
     # Filter for Runs and take the last 7
-    runs = [a for a in all_recent if a.get("type") == "Run"]
+    runs = [a for a in all_recent if a.get("type") in ("Run", "VirtualRun")]
     runs_sorted = sorted(runs, key=lambda a: a.get("start_date_local", ""), reverse=True)
     last7 = runs_sorted[:7]
 
