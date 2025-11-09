@@ -33,7 +33,7 @@ def main():
     details = get_activity(latest_id)
     streams, laps = {}, []
 
-    if details.get("type") == "Run":
+    if details.get("type") in ("Run", "VirtualRun"):
         try:
             streams = get_activity_streams(latest_id, ["time", "heartrate", "velocity_smooth", "cadence"])
         except Exception as e:
